@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代理模式</title>
+</head>
+<body>
+    
+</body>
+<script>
+/*代理模式:为一个对象提供一个代用品或占位符，以便控制对它的访问
+    保护代理:代理B可以帮代理A过滤一些请求
+    虚拟代理:把一些开销比较大的对象延迟到真正需要它的时候才去创建
+*/
+// var Flower = function(str){
+// }
+
+// var xiaoming = {
+//     sendFlower:function(target){
+//         target.receiveFlower()
+//     }
+// }
+// var A = {
+//     receiveFlower:function(flower){
+//         console.log('收到花'+flower)
+//     },
+//     listenGoodMood:function(fn){
+//         setTimeout(function(){
+//             fn()
+//         },10000)
+//     }
+// }
+// var B= {
+//     receiveFlower:function(flower){
+//         A.listenGoodMood(function(){
+//             var flower = new Flower()
+//             A.receiveFlower(flower)
+//         })
+//     }
+// }
+// xiaoming.sendFlower(B);
+
+
+// var myImage = (function(){
+//     var imgNode = document.createElement('img');
+//     document.body.appendChild(imgNode);
+//     return {
+//         setSrc:function(src){
+//             imgNode.src = src
+//         }
+//     }
+// })()
+
+
+// var proxyImage =(function(){
+//     var img = new Image;
+//     img.onload = function() {
+//         myImage.setSrc(this.src)
+//     }
+//     return{
+//         setSrc:function(src){
+//             myImage.setSrc("./images/50194330.jpg");
+//             img.src = src
+//         }
+//     }
+// })()
+// proxyImage.setSrc('')
+
+/************计算乘积**************/
+var mult = function(){
+    var a=1
+    for(var i=0,l=arguments.length;i<l;i++){
+        a = a*arguments[i]
+    }
+    return a
+}
+
+/**************计算加和********/
+var plus = function(){
+    var a=0
+    for(var i=0,l=arguments.length;i<l;i++){
+        a = a+arguments[i]
+    }
+    return a
+}
+
+var createProxyFactory = function(fn){
+    var cache = {}
+    console.log(cache)
+    return function(){
+    var args = Array.prototype.join.call(arguments,',')
+    if(args in cache){
+        return cache[args]
+    }
+    return cache[args] = fn.apply(this,arguments)
+    }
+}
+
+var proxyMult = createProxyFactory(mult)
+var proxyPlus = createProxyFactory(plus)
+console.log(proxyMult(1,2,3,4))
+console.log(proxyMult(1,2,3,4))
+console.log(proxyMult(2,3,3,4))
+console.log(proxyMult(2,3,3,4))
+console.log(proxyPlus(2,3,3,4))
+console.log(proxyPlus(2,3,3,4))
+</script>
+</html>

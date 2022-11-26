@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命令模式</title></title>
+</head>
+<body>
+    <button id="button1">按钮1</button>
+    <button id="button2">按钮2 </button>
+    <button id="button3">按钮3</button>
+    <p>--------------------------------------------------</p>
+    输入小球移动后的位置:<input id="pos"></input>
+    <div id="ball" style="position: absolute;background-color: #000;width: 50px;height: 50px;"></div>
+    <button id="moveBtn">开始移动</button>
+    <button id="replay">播放录像</button>
+    <script>
+        var btn1 = document.getElementById('button1')
+        var btn2 = document.getElementById('button2')
+        var btn3 = document.getElementById('button3')
+
+        var setCommand = function(button,command){
+            button.onclick  = function(){
+                command.execute()
+            }
+        }
+        var MenuBar = {
+            refresh:function(){
+                console.log("refresh menu")
+            }
+        }
+        var SubMenu ={
+            add:function(){
+                console.log("add menu")
+            },
+            delete:function(){
+                console.log("delete menu")
+            }
+        }
+       
+        /**************传统的命令模式********/
+        // var RefreshMenuBarCommand = function(revicer){
+        //     this.revicer=revicer
+        // }    
+        // RefreshMenuBarCommand.prototype.execute =function(){
+        //     this.revicer.refresh()
+        // }
+        // var AddSubMenuComand = function(revicer){
+        //     this.revicer=revicer
+        // }    
+        // AddSubMenuCommand.prototype.execute =function(){
+        //     this.revicer.add()
+        // }
+        // var DeleteSubMenuCommand = function(revicer){
+        //     this.revicer=revicer
+        // }    
+        // DeleteSubMenuCommand.prototype.execute =function(){
+        //     this.revicer.delete()
+        // }
+        // var addsubmenu = new AddSubMenuCommand(SubMenu)
+        // var deleteSubmenu = new DeleteSubMenuCommand(SubMenu)
+        // var refreshMenuBar = new RefreshMenuBarCommand(MenuBar)
+
+        // setCommand(btn1,addsubmenu)
+        // setCommand(btn2,deleteSubmenu)
+        // setCommand(btn3,refreshMenuBar)
+
+
+        /***************闭包实现的命令模式***********/
+        var setCommand2 =  function(button,func){
+            
+            button.onclick = function(){
+                func.execute()
+            }
+           
+       } 
+       var RefreshMenuBarCommand = function(revicer){
+           return  {
+                execute:function(){
+                    return revicer.refresh()
+                }
+           }
+       }
+       var refreshMenuBar = RefreshMenuBarCommand(MenuBar)
+       setCommand2(btn3,refreshMenuBar)
+    </script>
+    <script>
+        /*************9.4撤销命令******************/
+        var ball =  document.getElementById('ball')
+        var pos = document.getElementById('pos');
+        var moveBtn=  document.getElementById('moveBtn')
+        moveBtn.onclick = function(){
+            var  animate = new Animate(ball)
+            animate.start('left',pos.value,1000,'strongEaseOut')
+        }
+    </script>
+    <script>
+        /*********************9.5撤销与重做*******************/
+        var  Ryu = {
+            attack:function(){
+                console.log('攻击')
+            },
+            defense:function(){
+                console.log("防御");
+            },
+            jump:function(){
+                console.log("跳跃")
+            },
+            crouch:function(){
+                console.log("蹲下")
+            }
+        }
+        var makeCommand =  function(receiver,state){
+            return function(){
+                receiver[state]()
+            }
+        }
+        var commands={
+            "119":"jump",
+            "115":"crouch",
+            "97":"defense",
+            "100":"attack"
+        }
+        var commandStack = []
+        document.onkeypress =  function(ev){
+            var keyCode = ev.keyCode;
+            command = makeCommand(Ryu,commands[keyCode])
+            if(command){
+                command()
+                commandStack.push(command)
+            }
+        }
+        document.getElementById('replay').onclick= function(){
+            var  command;
+            while(command=commandStack.shift()){
+                command()
+            }
+        }
+    </script>
+    <script>
+        var closeCommand = {
+            execute:function(){
+                console.log("关门")
+            }
+        }
+        var openCommand = {
+            execute:function(){
+                console.log("开门")
+            }
+        }
+        var MacroCommand = function(){
+            return {
+                commandList:[],
+                add:function(command){
+                    this.commandList.push(command)
+                },
+                execute:function(){
+                    for(var i=0,command;command = this.commandList[i++];){
+                        command.execute()
+                    }
+                }
+            }
+        };
+        var macroCommand = MacroCommand()
+        macroCommand.add(closeCommand)
+        macroCommand.add(openCommand)
+        macroCommand.execute()
+    </script>
+</body>
+</html>
